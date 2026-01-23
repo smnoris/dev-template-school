@@ -110,7 +110,7 @@ const EventSchema = new Schema<IEvent>(
  * - Normalizes date to ISO format (YYYY-MM-DD)
  * - Ensures time is stored consistently (HH:MM format)
  */
-EventSchema.pre('save', function (next) {
+(EventSchema as any).pre('save', function(this: IEvent, next: (err?: any) => void) {
   // Generate slug only if title is new or modified
   if (this.isModified('title')) {
     this.slug = this.title
@@ -130,7 +130,7 @@ EventSchema.pre('save', function (next) {
         throw new Error('Invalid date format');
       }
       this.date = parsedDate.toISOString().split('T')[0];
-    } catch (error) {
+    } catch {
       return next(new Error('Date must be a valid date string'));
     }
   }
