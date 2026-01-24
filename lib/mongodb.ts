@@ -16,11 +16,7 @@ declare global {
 // Retrieve MongoDB URI from environment variables
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  throw new Error(
-    'Please define the MONGODB_URI environment variable inside .env.local'
-  );
-}
+
 
 /**
  * Global cached connection object to prevent multiple connections
@@ -39,6 +35,8 @@ if (!cached) {
  * @returns Promise resolving to the Mongoose connection instance
  */
 async function connectDB(): Promise<typeof mongoose> {
+
+  
   // Return existing connection if already established
   if (cached.conn) {
     return cached.conn;
@@ -46,6 +44,11 @@ async function connectDB(): Promise<typeof mongoose> {
 
   // Create new connection promise if one doesn't exist
   if (!cached.promise) {
+    if (!MONGODB_URI) {
+  throw new Error(
+    'Please define the MONGODB_URI environment variable inside .env.local'
+  );
+}
     const opts = {
       bufferCommands: false,
     };
