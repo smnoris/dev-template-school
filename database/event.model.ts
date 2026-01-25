@@ -110,7 +110,7 @@ const EventSchema = new Schema<IEvent>(
  * - Normalizes date to ISO format (YYYY-MM-DD)
  * - Ensures time is stored consistently (HH:MM format)
  */
-(EventSchema as any).pre('save', function(this: IEvent, next: (err?: any) => void) {
+EventSchema.pre('save', function(this: IEvent) {
   // Generate slug only if title is new or modified
   if (this.isModified('title')) {
     this.slug = this.title
@@ -131,7 +131,7 @@ const EventSchema = new Schema<IEvent>(
       }
       this.date = parsedDate.toISOString().split('T')[0];
     } catch {
-      return next(new Error('Date must be a valid date string'));
+      throw new Error('Date must be a valid date string');
     }
   }
 
@@ -139,11 +139,9 @@ const EventSchema = new Schema<IEvent>(
   if (this.isModified('time')) {
     const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
     if (!timeRegex.test(this.time)) {
-      return next(new Error('Time must be in HH:MM format'));
+      throw new Error('Time must be in HH:MM format');
     }
   }
-
-  next();
 });
 
 // Add unique index to slug for faster queries and uniqueness enforcement
