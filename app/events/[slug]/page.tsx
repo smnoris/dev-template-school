@@ -35,10 +35,45 @@ const EventTags = ({ tags }: { tags: string[] }) => (
 );
 const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
-  const request = await fetch(`${BASE_URL}/api/events/${slug}`);
-  const { event: { description, image, overview, date, time, location, mode, agenda, audience, tags, organizer } } = await request.json();
 
-  if (!description) return notFound();
+  // Validate BASE_URL
+  if (!BASE_URL) {
+    throw new Error('NEXT_PUBLIC_BASE_URL environment variable is not defined');
+  }
+
+  let event;
+  try {
+    const request = await fetch(`${BASE_URL}/api/events/${slug}`);
+
+    // Handle 404 specifically
+    if (request.status === 404) {
+      return notFound();
+    }
+
+    // Handle other non-OK responses
+    if (!request.ok) {
+      throw new Error(`Failed to fetch event: ${request.status} ${request.statusText}`);
+    }
+
+    const data = await request.json();
+
+    // Validate response structure
+    if (!data || !data.event) {
+      throw new Error('Invalid response structure: missing event data');
+    }
+
+    event = data.event;
+
+    // Validate required fields
+    if (!event.description) {
+      return notFound();
+    }
+  } catch (error) {
+    console.error('Error fetching event:', error);
+    return notFound();
+  }
+
+  const { description, image, overview, date, time, location, mode, agenda, audience, tags, organizer } = event;
 
   const bookings = 10;
 
@@ -106,7 +141,7 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ slug: string }> 
         <h2>Similar Events</h2>
         <div className="events">
           {similarEvents.length > 0 && similarEvents.map((similarEvent: IEvent) => (
-            <EventCard key={String(similarEvent.title)} {...similarEvent} />
+            <EventCard key={similarEvent.slug} {...similarEvent} />
           ))}
         </div>
       </div>

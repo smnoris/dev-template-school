@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
  * during API Route usage.
  */
 declare global {
-  var mongoose: {
+  var mongooseCache: {
     conn: mongoose.Connection | null;
     promise: Promise<mongoose.Connection> | null;
   };
@@ -25,10 +25,10 @@ if (!MONGODB_URI) {
  * Global cached connection object to prevent multiple connections
  * during development hot reloads.
  */
-let cached = global.mongoose;
+let cached = global.mongooseCache;
 
 if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+  cached = global.mongooseCache = { conn: null, promise: null };
 }
 
 /**

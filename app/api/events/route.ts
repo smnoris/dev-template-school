@@ -23,8 +23,41 @@ export async function POST(req: NextRequest) {
 
         if (!file) return NextResponse.json({ message: 'Image file is required' }, { status: 400 });
 
-        let tags = JSON.parse(formData.get('tags') as string);
-        let agenda = JSON.parse(formData.get('agenda') as string);
+        // Validate and parse tags
+        const tagsRaw = formData.get('tags');
+        if (!tagsRaw || typeof tagsRaw !== 'string' || tagsRaw.trim() === '') {
+            return NextResponse.json({ message: 'Tags field is required and must be a non-empty string' }, { status: 400 });
+        }
+        let tags;
+        try {
+            tags = JSON.parse(tagsRaw);
+            if (!Array.isArray(tags)) {
+                return NextResponse.json({ message: 'Tags must be a valid JSON array' }, { status: 400 });
+            }
+        } catch (error) {
+            return NextResponse.json({
+                message: 'Failed to parse tags field',
+                error: error instanceof Error ? error.message : 'Invalid JSON format'
+            }, { status: 400 });
+        }
+
+        // Validate and parse agenda
+        const agendaRaw = formData.get('agenda');
+        if (!agendaRaw || typeof agendaRaw !== 'string' || agendaRaw.trim() === '') {
+            return NextResponse.json({ message: 'Agenda field is required and must be a non-empty string' }, { status: 400 });
+        }
+        let agenda;
+        try {
+            agenda = JSON.parse(agendaRaw);
+            if (!Array.isArray(agenda)) {
+                return NextResponse.json({ message: 'Agenda must be a valid JSON array' }, { status: 400 });
+            }
+        } catch (error) {
+            return NextResponse.json({
+                message: 'Failed to parse agenda field',
+                error: error instanceof Error ? error.message : 'Invalid JSON format'
+            }, { status: 400 });
+        }
 
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
