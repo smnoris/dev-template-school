@@ -15,15 +15,26 @@ interface ApiResponse {
   error?: string;
 }
 
-/** Validates slug format (alphanumeric with hyphens, no leading/trailing hyphens) */
+/**
+ * Determines whether a slug consists of lowercase alphanumeric segments separated by single hyphens, with no leading or trailing hyphens.
+ *
+ * @param slug - The slug to validate
+ * @returns `true` if `slug` matches the required format, `false` otherwise.
+ */
 function isValidSlug(slug: string): boolean {
   const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
   return slugRegex.test(slug);
 }
 
 /**
- * GET /api/events/[slug]
- * Fetches a single event by its unique slug identifier
+ * Fetches an event by its route `slug` and returns a standard API response containing the event when found.
+ *
+ * @param context - Route context whose `params` promise yields an object with a `slug` string extracted from the URL.
+ * @returns An API response object with a `message` and, on success, an `event` property. Possible HTTP statuses:
+ * - 200: event found and returned
+ * - 400: missing or invalid `slug` parameter
+ * - 404: event not found
+ * - 500: server or database error (includes error message when available)
  */
 export async function GET(
   req: NextRequest,
@@ -107,4 +118,3 @@ export async function GET(
     );
   }
 }
-
