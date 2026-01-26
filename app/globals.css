@@ -158,7 +158,7 @@
   }
 
   ul {
-    @apply list-disc list-inside list-none;
+    @apply list-none;
   }
 }
 
@@ -201,7 +201,7 @@
     @apply grid md:grid-cols-3 gap-10 sm:grid-cols-2 grid-cols-1;
   }
 
-  #event-card {
+  .event-card {
     @apply flex flex-col gap-3;
 
     .poster {

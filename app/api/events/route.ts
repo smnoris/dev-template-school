@@ -4,6 +4,15 @@ import { v2 as cloudinary } from 'cloudinary';
 import connectDB from "@/lib/mongodb";
 import Event from '@/database/event.model';
 
+/**
+ * Handle POST requests to create a new event with an uploaded image and persist it to the database.
+ *
+ * Attempts to parse form data, upload the provided `image` file to Cloudinary, attach the resulting image URL to the event data, and create an Event document.
+ *
+ * @returns For a successful creation: a JSON object `{ message: 'Event Created Successfully', event: <created event> }` with status `201`.  
+ * For client errors: a JSON object with a `message` describing the validation error (e.g., `'Invalid JSON data format'` or `'Image file is required'`) with status `400`.  
+ * For server errors: a JSON object `{ message: 'Event Creation Failed', error: <error message> }` with status `500`.
+ */
 export async function POST(req: NextRequest) {
     try {
         await connectDB();
@@ -23,8 +32,41 @@ export async function POST(req: NextRequest) {
 
         if (!file) return NextResponse.json({ message: 'Image file is required' }, { status: 400 });
 
-        let tags = JSON.parse(formData.get('tags') as string);
-        let agenda = JSON.parse(formData.get('agenda') as string);
+        // Validate and parse tags
+        const tagsRaw = formData.get('tags');
+        if (!tagsRaw || typeof tagsRaw !== 'string' || tagsRaw.trim() === '') {
+            return NextResponse.json({ message: 'Tags field is required and must be a non-empty string' }, { status: 400 });
+        }
+        let tags;
+        try {
+            tags = JSON.parse(tagsRaw);
+            if (!Array.isArray(tags)) {
+                return NextResponse.json({ message: 'Tags must be a valid JSON array' }, { status: 400 });
+            }
+        } catch (error) {
+            return NextResponse.json({
+                message: 'Failed to parse tags field',
+                error: error instanceof Error ? error.message : 'Invalid JSON format'
+            }, { status: 400 });
+        }
+
+        // Validate and parse agenda
+        const agendaRaw = formData.get('agenda');
+        if (!agendaRaw || typeof agendaRaw !== 'string' || agendaRaw.trim() === '') {
+            return NextResponse.json({ message: 'Agenda field is required and must be a non-empty string' }, { status: 400 });
+        }
+        let agenda;
+        try {
+            agenda = JSON.parse(agendaRaw);
+            if (!Array.isArray(agenda)) {
+                return NextResponse.json({ message: 'Agenda must be a valid JSON array' }, { status: 400 });
+            }
+        } catch (error) {
+            return NextResponse.json({
+                message: 'Failed to parse agenda field',
+                error: error instanceof Error ? error.message : 'Invalid JSON format'
+            }, { status: 400 });
+        }
 
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
@@ -51,6 +93,11 @@ export async function POST(req: NextRequest) {
     }
 }
 
+/**
+ * Fetches all Event documents from the database sorted by newest first.
+ *
+ * @returns A JSON response with `{ message, events }` where `events` is an array of Event objects on success (HTTP 200), or `{ message, error }` on failure (HTTP 500).
+ */
 export async function GET() {
     try {
         await connectDB();

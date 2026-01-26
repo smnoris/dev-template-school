@@ -20,6 +20,12 @@ export const metadata: Metadata = {
   description: "Escuela de comedia musical",
 };
 
+/**
+ * Root layout component that provides global fonts, analytics context, navigation, and a decorative light-rays background.
+ *
+ * @param children - The page content to render inside the layout
+ * @returns The top-level HTML structure for the application (html > body) that wraps `children` with fonts, a PostHog analytics provider, the `Navbar`, and the `LightRays` background layer
+ */
 export default function RootLayout({
 
 
@@ -31,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${schibstedGrotesk.variable} ${martianMono.variable} min-h-screenantialiased`}
+        className={`${schibstedGrotesk.variable} ${martianMono.variable} min-h-screen antialiased`}
       >
         <PostHogProvider>
           <Navbar />
@@ -55,4 +61,3 @@ export default function RootLayout({
     </html>
   );
 }
-
