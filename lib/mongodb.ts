@@ -6,10 +6,9 @@ import mongoose from 'mongoose';
  * during API Route usage.
  */
 declare global {
-  // eslint-disable-next-line no-var
   var mongoose: {
-    conn: typeof mongoose | null;
-    promise: Promise<typeof mongoose> | null;
+    conn: mongoose.Connection | null;
+    promise: Promise<mongoose.Connection> | null;
   };
 }
 
@@ -38,7 +37,7 @@ if (!cached) {
  * 
  * @returns Promise resolving to the Mongoose connection instance
  */
-async function connectDB(): Promise<typeof mongoose> {
+async function connectDB(): Promise<mongoose.Connection> {
   // Return existing connection if already established
   if (cached.conn) {
     return cached.conn;
@@ -50,9 +49,7 @@ async function connectDB(): Promise<typeof mongoose> {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = mongoose.connect(MONGODB_URI!, opts).then(() => mongoose.connection);
   }
 
   try {
