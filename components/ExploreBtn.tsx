@@ -20,7 +20,7 @@ const ExploreBtn = () => {
       role="button"
       aria-label="Scroll to events section"
     >
-      Explore Events
+      Inscripciones
       <Image src="/icons/arrow-down.svg" alt="Arrow Down" width={24} height={24} />
     </a>
   )
