@@ -4,6 +4,11 @@ import bcrypt from "bcryptjs";
 import connectDB from "@/lib/mongodb";
 import User from "@/database/user.model";
 
+/**
+ * Handle user registration requests and create a new user account.
+ *
+ * @returns A NextResponse containing a success message and a sanitized user object (`_id`, `name`, `email`, `birthDate`, `socialMedia`) with status `201` on successful registration; a JSON error message with status `400` when required fields are missing or the email is already registered; or a JSON error message with status `500` when an unexpected server error occurs.
+ */
 export async function POST(req: NextRequest) {
     try {
         await connectDB();
