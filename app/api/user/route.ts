@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from 'cloudinary';
+import bcrypt from "bcryptjs";
 
 import connectDB from "@/lib/mongodb";
 import User from '@/database/user.model';
@@ -34,6 +35,11 @@ export async function POST(req: NextRequest) {
         const existingUser = await User.findOne({ email: userData.email.toLowerCase() });
         if (existingUser) {
             return NextResponse.json({ message: 'User with this email already exists' }, { status: 400 });
+        }
+
+        // Hash password if provided
+        if (userData.password && typeof userData.password === 'string') {
+            userData.password = await bcrypt.hash(userData.password, 12);
         }
 
         // Handle optional image upload

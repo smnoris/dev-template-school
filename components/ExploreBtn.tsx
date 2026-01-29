@@ -1,28 +1,18 @@
-'use client';
-
 import Image from "next/image";
+import Link from "next/link";
 
 const ExploreBtn = () => {
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const eventsSection = document.querySelector('#events');
-    if (eventsSection) {
-      eventsSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <a
-      href="#events"
+    <Link
+      href="/inscripcion/nuevo"
       id="explore-btn"
       className="mt-7 mx-auto"
-      onClick={handleClick}
       role="button"
-      aria-label="Scroll to events section"
+      aria-label="Ir a inscripciones"
     >
       Inscripciones
-      <Image src="/icons/arrow-down.svg" alt="Arrow Down" width={24} height={24} />
-    </a>
+      <Image src="/icons/arrow-down.svg" alt="Arrow Right" width={24} height={24} />
+    </Link>
   )
 }
 
