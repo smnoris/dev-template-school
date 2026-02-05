@@ -14,6 +14,7 @@ export interface IUser extends Document {
     socialMedia?: string;
     createdAt: Date;
     updatedAt: Date;
+    obra?: string;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -71,6 +72,11 @@ const UserSchema = new Schema<IUser>(
         },
 
         socialMedia: {
+            type: String,
+            trim: true,
+        },
+
+        obra: {
             type: String,
             trim: true,
         },
