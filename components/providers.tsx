@@ -1,7 +1,7 @@
 'use client'
 
-import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
+import { SessionProvider } from "next-auth/react"
 
 import posthog from 'posthog-js'
 import { PostHogProvider as PHProvider } from 'posthog-js/react'
@@ -33,4 +33,11 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       {children}
     </PHProvider>
   )
+}
+
+/**
+ * Provides NextAuth session context to descendant components.
+ */
+export function NextAuthProvider({ children }: { children: React.ReactNode }) {
+  return <SessionProvider>{children}</SessionProvider>
 }
