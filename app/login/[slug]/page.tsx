@@ -1,10 +1,15 @@
 import LogIn from '@/components/LogIn';
 
+interface PageProps {
+  params: Promise<{
+    slug: string;
+  }>;
+}
 
-
-const Page = () => {
-
-
+const Page = async ({ params }: PageProps) => {
+  const { slug } = await params;
+  // El slug puede ser usado para diferentes flujos de login en el futuro
+  // Por ejemplo: /login/admin, /login/alumno, etc.
 
   return (
     <section id="login" className="p-5 sm:px-10">

@@ -41,8 +41,8 @@ export async function POST(req: NextRequest) {
         // Verificar si el usuario está activo
         if (!user.isActive) {
             return NextResponse.json(
-                { message: "Usuario desactivado" },
-                { status: 403 }
+                { message: "Credenciales inválidas" },
+                { status: 401 }
             );
         }
 
@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
             email: user.email,
             role: user.role,
             image: user.image,
+            feesUpToDate: user.feesUpToDate,
         };
 
         return NextResponse.json(
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error("Error en login:", error);
         return NextResponse.json(
-            { message: "Error al iniciar sesión", error: error instanceof Error ? error.message : "Unknown" },
+            { message: "An unexpected error occurred" },
             { status: 500 }
         );
     }

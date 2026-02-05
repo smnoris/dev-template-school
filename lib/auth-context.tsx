@@ -9,6 +9,7 @@ interface User {
     email: string;
     role: 'alumno' | 'profesor' | 'admin' | 'owner';
     image?: string;
+    feesUpToDate?: boolean;
 }
 
 interface AuthContextType {
@@ -25,6 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const { data: session, status } = useSession();
 
+    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
         // Sincronizar con sesión de NextAuth (Google login)
         if (status === 'authenticated' && session?.user) {
@@ -34,25 +36,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 email: session.user.email || '',
                 role: (session.user.role as User['role']) || 'alumno',
                 image: session.user.image || undefined,
+                feesUpToDate: session.user.feesUpToDate,
             };
             setUser(sessionUser);
             localStorage.setItem('user', JSON.stringify(sessionUser));
-            setIsLoading(false);
         } else if (status === 'unauthenticated') {
-            // Si no hay sesión de NextAuth, intentar cargar desde localStorage
-            const storedUser = localStorage.getItem('user');
-            if (storedUser) {
-                try {
-                    setUser(JSON.parse(storedUser));
-                } catch {
-                    localStorage.removeItem('user');
-                }
-            }
-            setIsLoading(false);
-        } else if (status === 'loading') {
-            setIsLoading(true);
+            // Limpiar cualquier dato de sesión almacenado localmente
+            localStorage.removeItem('user');
+            setUser(null);
         }
     }, [session, status]);
+
+    useEffect(() => {
+        if (status !== 'loading') {
+            setIsLoading(false);
+        }
+    }, [status]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const login = (userData: User) => {
         setUser(userData);

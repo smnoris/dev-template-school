@@ -9,14 +9,15 @@ const DashboardSidebar = () => {
     const pathname = usePathname();
     const { user, logout } = useAuth();
 
+    const role = user?.role ?? 'alumno';
     const menuItems = [
-        { href: `/dashboard/${user?.role}`, label: 'Dashboard', icon: '📊' },
-        { href: `/dashboard/${user?.role}/usuarios`, label: 'Usuarios', icon: '👥' },
-        { href: `/dashboard/${user?.role}/clases`, label: 'Clases', icon: '📚' },
-        { href: `/dashboard/${user?.role}/eventos`, label: 'Eventos', icon: '🎭' },
-        { href: `/dashboard/${user?.role}/cuotas`, label: 'Cuotas', icon: '💰' },
-        { href: `/dashboard/${user?.role}/reportes`, label: 'Reportes', icon: '📈' },
-        { href: `/dashboard/${user?.role}/configuracion`, label: 'Configuración', icon: '⚙️' },
+        { href: `/dashboard/${role}`, label: 'Dashboard', icon: '📊' },
+        { href: `/dashboard/${role}/usuarios`, label: 'Usuarios', icon: '👥' },
+        { href: `/dashboard/${role}/clases`, label: 'Clases', icon: '📚' },
+        { href: `/dashboard/${role}/eventos`, label: 'Eventos', icon: '🎭' },
+        { href: `/dashboard/${role}/cuotas`, label: 'Cuotas', icon: '💰' },
+        { href: `/dashboard/${role}/reportes`, label: 'Reportes', icon: '📈' },
+        { href: `/dashboard/${role}/configuracion`, label: 'Configuración', icon: '⚙️' },
     ];
 
     return (
@@ -45,8 +46,8 @@ const DashboardSidebar = () => {
 
             <div className="sidebar-footer">
                 <button
-                    onClick={() => {
-                        logout();
+                    onClick={async () => {
+                        await logout();
                         window.location.href = '/';
                     }}
                     className="logout-btn"

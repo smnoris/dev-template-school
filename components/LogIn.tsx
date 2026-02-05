@@ -3,9 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useAuth } from "@/lib/auth-context";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const LogIn = () => {
     const [formData, setFormData] = useState({
@@ -15,7 +12,6 @@ const LogIn = () => {
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { login } = useAuth();
     const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,23 +25,28 @@ const LogIn = () => {
         setError(null);
 
         try {
-            const response = await fetch(`${BASE_URL}/api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
+            const result = await signIn("credentials", {
+                email: formData.email,
+                password: formData.password,
+                redirect: false,
             });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Error al iniciar sesión');
+            if (result?.error) {
+                throw new Error(result.error);
             }
 
-            // Guardar usuario en contexto y redirigir según rol
-            login(data.user);
-            router.push(`/dashboard/${data.user.role}`);
+            if (result?.ok) {
+                // La sesión de NextAuth se sincronizará automáticamente con el contexto
+                // Redirigir según el rol del usuario
+                const response = await fetch('/api/auth/session');
+                const session = await response.json();
+                
+                if (session?.user?.role) {
+                    router.push(`/dashboard/${session.user.role}`);
+                } else {
+                    router.push('/dashboard/alumno');
+                }
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error desconocido');
         } finally {

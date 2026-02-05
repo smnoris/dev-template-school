@@ -43,7 +43,7 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 if (!user.isActive) {
-                    throw new Error("Usuario desactivado");
+                    throw new Error("Credenciales inválidas");
                 }
 
                 return {
@@ -52,6 +52,7 @@ export const authOptions: NextAuthOptions = {
                     email: user.email,
                     image: user.image,
                     role: user.role,
+                    feesUpToDate: user.feesUpToDate,
                 };
             },
         }),
@@ -88,7 +89,7 @@ export const authOptions: NextAuthOptions = {
             }
             return true;
         },
-        async jwt({ token, user, account }) {
+        async jwt({ token, user }) {
             if (user) {
                 await connectDB();
                 const dbUser = await User.findOne({ 
@@ -99,6 +100,7 @@ export const authOptions: NextAuthOptions = {
                     token.id = dbUser._id.toString();
                     token.role = dbUser.role;
                     token.image = dbUser.image;
+                    token.feesUpToDate = dbUser.feesUpToDate;
                 }
             }
             return token;
@@ -108,6 +110,7 @@ export const authOptions: NextAuthOptions = {
                 session.user.id = token.id as string;
                 session.user.role = token.role as string;
                 session.user.image = token.image as string;
+                session.user.feesUpToDate = token.feesUpToDate as boolean;
             }
             return session;
         },
